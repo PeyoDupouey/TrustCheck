@@ -7,11 +7,14 @@ Créer une extension de navigateur qui analyse le contenu visible sur Instagram 
 ## MVP
 
 - Instagram Web uniquement.
-- Analyse déclenchée par l’utilisateur.
+- Analyse déclenchée par l’utilisateur ou lors de l'arrivée d'un post visible.
+- Retour visuel immédiat (`analyse en cours`) puis résultat progressif.
 - Texte visible et sous-titres accessibles en priorité.
 - OCR en complément pour le texte incrusté.
 - Extraction des affirmations vérifiables.
+- Priorisation des affirmations les plus vérifiables avant recherche.
 - Recherche de sources publiques.
+- Cache court par contenu et analyse limitée au post visible.
 - Verdict nuancé avec confiance, explication et citations.
 
 ## Hors périmètre initial
@@ -38,8 +41,8 @@ Créer une extension de navigateur qui analyse le contenu visible sur Instagram 
 1. Valider le périmètre et le nom du dépôt.
 2. Initialiser le dépôt et la documentation.
 3. Concevoir le contrat d’analyse et le format des preuves.
-4. Prototyper l’extraction d’affirmations hors navigateur.
-5. Ajouter l’extension minimale.
+4. Prototyper l’extraction d’affirmations hors navigateur. **En cours — voir `docs/PHASE_1.md`.**
+5. Ajouter l’extension minimale avec annulation, cache et analyse progressive. **En cours — voir `extension/`.**
 6. Ajouter les sous-titres, l’OCR et la transcription fallback.
 7. Construire le jeu d’évaluation et mesurer les erreurs.
 8. Préparer une bêta limitée.
@@ -51,3 +54,4 @@ Créer une extension de navigateur qui analyse le contenu visible sur Instagram 
 - Les résultats peuvent être reproduits à partir des entrées et des sources conservées.
 - L’analyse fonctionne sans fournisseur payant obligatoire en environnement local.
 - Les tests couvrent les cas vrais, faux, ambigus et satiriques.
+- Le score indique toujours son type : confiance factuelle ou couverture des sources.

@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "TrustCheck",
+  "version": "0.1.0",
+  "description": "Analyse progressivement les affirmations du post Instagram visible.",
+  "permissions": [],
+  "host_permissions": [
+    "https://www.instagram.com/*",
+    "http://127.0.0.1:8765/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.instagram.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
