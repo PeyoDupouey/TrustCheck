@@ -33,7 +33,10 @@ def _analyze_claim(claim: Claim, provider: SourceProvider, judge=None) -> ClaimR
                 claim=claim,
                 verdict="non vérifiable",
                 confidence=0.0,
-                explanation=f"La réponse du LLM n'est pas exploitable : {error}.",
+                explanation=(
+                    "Le modèle local n'a pas rendu une réponse exploitable. "
+                    "Réessayez ou utilisez un modèle plus grand."
+                ),
                 sources=sources,
             )
         selected_sources = [source for source in sources if source.url in judged["source_urls"]]

@@ -45,6 +45,12 @@
 
   function formatResults(analysis) {
     const fragment = document.createDocumentFragment();
+    if (!(analysis.results || []).length) {
+      const empty = document.createElement("div");
+      empty.textContent = "Aucune affirmation factuelle détectée dans le texte accessible.";
+      fragment.appendChild(empty);
+      return [fragment];
+    }
     for (const item of (analysis.results || [])) {
       const block = document.createElement("div");
       block.textContent = `${item.verdict} (${Math.round(item.confidence * 100)} %) — ${item.explanation}`;

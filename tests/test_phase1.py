@@ -108,6 +108,31 @@ class Phase1Tests(unittest.TestCase):
         self.assertEqual(result["verdict"], "confirmée")
         self.assertEqual(result["source_urls"], ["https://example.org"])
 
+    def test_ollama_judge_maps_short_source_indexes(self):
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self):
+                payload = {
+                    "message": {
+                        "content": '{"verdict":"confirmée","confidence":0.8,"explanation":"La source confirme.","source_indexes":[1]}'
+                    }
+                }
+                return json.dumps(payload).encode("utf-8")
+
+        sources = [
+            Source("Source 1", "https://one.example", "Preuve"),
+            Source("Source 2", "https://two.example", "Autre preuve"),
+        ]
+        with patch("prototype.llm.urlopen", return_value=FakeResponse()):
+            result = OllamaFactChecker().judge(extract_claims("Le taux est de 10%.")[0], sources)
+
+        self.assertEqual(result["source_urls"], ["https://one.example"])
+
     def test_invalid_llm_response_falls_back_to_unverifiable(self):
         class BrokenJudge:
             def judge(self, claim, sources):
