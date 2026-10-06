@@ -5,6 +5,7 @@ from unittest.mock import patch
 from prototype.analyzer import analyze_text
 from prototype.cache import MemoryTTLCache, content_key
 from prototype.claims import extract_claims
+from prototype.evidence import evidence_score
 from prototype.llm import OllamaFactChecker
 from prototype.gemini import GeminiFactChecker
 from prototype.models import Source
@@ -24,6 +25,16 @@ class Phase1Tests(unittest.TestCase):
         claims = extract_claims("Cette réforme est entrée en vigueur en 2024. Je la trouve utile.")
         self.assertEqual([claim.text for claim in claims], ["Cette réforme est entrée en vigueur en 2024."])
 
+    def test_prioritizes_numeric_claim_over_general_statement(self):
+        claims = extract_claims(
+            "Cette réforme est importante. Elle concerne 4 700 personnes en 2024."
+        )
+        self.assertEqual(claims[0].text, "Elle concerne 4 700 personnes en 2024.")
+        self.assertGreater(claims[0].checkworthiness, claims[1].checkworthiness)
+
+    def test_subjective_statement_is_not_selected(self):
+        self.assertEqual(extract_claims("Je trouve cette réforme magnifique."), [])
+
     def test_missing_sources_is_not_presented_as_false(self):
         analysis = analyze_text("Le vaccin est dangereux.", StaticSourceProvider())
         self.assertEqual(analysis.results[0].verdict, "non vérifiable")
@@ -34,6 +45,16 @@ class Phase1Tests(unittest.TestCase):
         analysis = analyze_text("Le taux est de 10%.", StaticSourceProvider([source]))
         self.assertEqual(analysis.results[0].sources, [source])
         self.assertEqual(analysis.results[0].verdict, "à examiner")
+        self.assertEqual(analysis.results[0].confidence_kind, "couverture des sources")
+
+    def test_evidence_score_ranks_matching_source_and_is_capped(self):
+        claim = extract_claims("Le vaccin est administré en deux doses.")[0]
+        matching = Source("Vaccin deux doses", "https://sante.gouv.fr/vaccin", "Le vaccin est administré en deux doses.")
+        unrelated = Source("Sport", "https://example.org/sport", "Résultats du match.")
+        score, sources = evidence_score(claim, [unrelated, matching])
+        self.assertEqual(sources[0], matching)
+        self.assertGreater(score, 0.4)
+        self.assertLessEqual(score, 0.78)
 
     def test_searxng_provider_maps_json_results(self):
         class FakeResponse:
@@ -167,8 +188,9 @@ class Phase1Tests(unittest.TestCase):
 
         source = Source("Source", "https://example.org", "Preuve")
         analysis = analyze_text("Le taux est de 10%.", StaticSourceProvider([source]), BrokenJudge())
-        self.assertEqual(analysis.results[0].verdict, "non vérifiable")
-        self.assertEqual(analysis.results[0].confidence, 0.0)
+        self.assertEqual(analysis.results[0].verdict, "à examiner")
+        self.assertGreater(analysis.results[0].confidence, 0.0)
+        self.assertEqual(analysis.results[0].confidence_kind, "couverture des sources")
 
 
 if __name__ == "__main__":

@@ -29,3 +29,12 @@ Gemini peut être utilisé comme moteur de jugement prioritaire lorsqu'une clé
 API est fournie par l'utilisateur. La clé reste dans l'environnement de l'API
 locale et n'est jamais embarquée dans l'extension. Ollama reste disponible
 comme solution locale lorsque Gemini n'est pas configuré.
+
+## D-007 — Pipeline fondé sur les étapes de l’AFC
+
+TrustCheck suit les trois étapes de l'automated fact-checking : extraction des
+affirmations, récupération de preuves, puis verdict et justification. La
+ressource de référence est [Automated Fact-Checking Resources](https://github.com/Cartus/Automated-Fact-Checking-Resources).
+Elle sert à orienter les jeux d'évaluation et les composants à étudier, mais
+n'est pas une dépendance d'exécution : le dépôt est une bibliographie et une
+cartographie de ressources, pas un service de vérification prêt à déployer.

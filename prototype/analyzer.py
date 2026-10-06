@@ -1,4 +1,5 @@
 from .claims import extract_claims
+from .evidence import evidence_score
 from .models import Analysis, Claim, ClaimResult
 from .sources import SourceProvider
 
@@ -24,20 +25,23 @@ def _analyze_claim(claim: Claim, provider: SourceProvider, judge=None) -> ClaimR
             verdict="non vérifiable",
             confidence=0.0,
             explanation="Aucune source n'a été fournie au prototype.",
+            confidence_kind="couverture des sources",
         )
     if judge is not None:
         try:
             judged = judge.judge(claim, sources)
-        except (OSError, TimeoutError, ValueError) as error:
+        except (OSError, TimeoutError, ValueError):
+            score, selected_sources = evidence_score(claim, sources)
             return ClaimResult(
                 claim=claim,
-                verdict="non vérifiable",
-                confidence=0.0,
+                verdict="à examiner",
+                confidence=score,
                 explanation=(
-                    "Le modèle local n'a pas rendu une réponse exploitable. "
-                    "Réessayez ou utilisez un modèle plus grand."
+                    "Le jugement automatique est indisponible. Le score indique "
+                    "la couverture des extraits trouvés, pas la vérité de l'affirmation."
                 ),
-                sources=sources,
+                sources=selected_sources,
+                confidence_kind="couverture des sources",
             )
         selected_sources = [source for source in sources if source.url in judged["source_urls"]]
         return ClaimResult(
@@ -50,10 +54,11 @@ def _analyze_claim(claim: Claim, provider: SourceProvider, judge=None) -> ClaimR
     return ClaimResult(
         claim=claim,
         verdict="à examiner",
-        confidence=0.25,
+        confidence=evidence_score(claim, sources)[0],
         explanation=(
-            "Des sources candidates sont disponibles, mais le prototype ne "
-            "déduit pas encore automatiquement la véracité."
+            "Le score indique la couverture des extraits trouvés, pas la vérité "
+            "de l'affirmation."
         ),
-        sources=sources,
+        sources=evidence_score(claim, sources)[1],
+        confidence_kind="couverture des sources",
     )

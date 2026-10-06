@@ -14,6 +14,7 @@ Valider le contrat de données du moteur de vérification avant de dépendre d�
 - résultat prudent lorsqu’aucune preuve n’est disponible ;
 - sortie JSON utilisable par une future API ou extension ;
 - cache mémoire court des recherches SearXNG ;
+- repli déterministe avec un indice de couverture des sources lorsque le LLM échoue ;
 - limite de trois affirmations et cinq sources par contenu pour préserver la réactivité ;
 - tests unitaires sans réseau.
 
@@ -34,6 +35,14 @@ visible à la fois, affiche immédiatement un état `analyse en cours`, puis lan
 la recherche et le jugement en arrière-plan. Si l'utilisateur passe au contenu
 suivant, la tâche précédente doit être annulée. Les résultats sont conservés
 dans un cache court indexé par empreinte, sans conserver le texte original.
+
+## Score affiché
+
+Lorsque Gemini ou un LLM local produit un verdict exploitable, le score est une
+confiance factuelle. Sinon, TrustCheck affiche une **couverture des sources** :
+elle mesure la correspondance des extraits avec l'affirmation, la diversité des
+domaines et la présence de sources institutionnelles. Ce n'est pas une
+probabilité que l'affirmation soit vraie et elle est plafonnée à 78 %.
 
 ## Prochaine itération
 

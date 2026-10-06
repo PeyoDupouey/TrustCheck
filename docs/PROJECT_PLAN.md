@@ -12,6 +12,7 @@ Créer une extension de navigateur qui analyse le contenu visible sur Instagram 
 - Texte visible et sous-titres accessibles en priorité.
 - OCR en complément pour le texte incrusté.
 - Extraction des affirmations vérifiables.
+- Priorisation des affirmations les plus vérifiables avant recherche.
 - Recherche de sources publiques.
 - Cache court par contenu et analyse limitée au post visible.
 - Verdict nuancé avec confiance, explication et citations.
@@ -53,3 +54,4 @@ Créer une extension de navigateur qui analyse le contenu visible sur Instagram 
 - Les résultats peuvent être reproduits à partir des entrées et des sources conservées.
 - L’analyse fonctionne sans fournisseur payant obligatoire en environnement local.
 - Les tests couvrent les cas vrais, faux, ambigus et satiriques.
+- Le score indique toujours son type : confiance factuelle ou couverture des sources.

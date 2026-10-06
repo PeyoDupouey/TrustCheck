@@ -13,6 +13,7 @@ class Source:
 class Claim:
     text: str
     position: int
+    checkworthiness: float = 0.0
 
 
 @dataclass
@@ -22,9 +23,9 @@ class ClaimResult:
     confidence: float
     explanation: str
     sources: list[Source] = field(default_factory=list)
+    confidence_kind: str = "confiance factuelle"
 
 
 @dataclass
 class Analysis:
     results: list[ClaimResult]
-

@@ -7,7 +7,13 @@
   let requestId = 0;
 
   function textFromArticle(article) {
-    return (article.innerText || "").replace(/\s+/g, " ").trim().slice(0, 12000);
+    const clone = article.cloneNode(true);
+    clone.querySelectorAll(".trustcheck-panel").forEach((panel) => panel.remove());
+    const visibleText = (clone.innerText || clone.textContent || "").replace(/\s+/g, " ").trim();
+    const imageDescriptions = [...article.querySelectorAll("img[alt]")]
+      .map((image) => image.alt.trim())
+      .filter((alt) => alt && !/^photo by /i.test(alt));
+    return [visibleText, ...imageDescriptions].join(" ").slice(0, 12000);
   }
 
   function addPanel(article) {
@@ -53,7 +59,8 @@
     }
     for (const item of (analysis.results || [])) {
       const block = document.createElement("div");
-      block.textContent = `${item.verdict} (${Math.round(item.confidence * 100)} %) — ${item.explanation}`;
+      const confidenceKind = item.confidence_kind || "confiance factuelle";
+      block.textContent = `Affirmation : ${item.claim.text}\n${item.verdict} — ${confidenceKind} : ${Math.round(item.confidence * 100)} % — ${item.explanation}`;
       for (const source of (item.sources || []).slice(0, 3)) {
         const link = document.createElement("a");
         link.className = "trustcheck-source";
