@@ -26,3 +26,27 @@ Valider le contrat de données du moteur de vérification avant de dépendre d�
 ## Prochaine itération
 
 Configurer une instance SearXNG locale, puis comparer ses résultats avec un petit jeu de cas annotés avant d'introduire un modèle local.
+
+## SearXNG local
+
+Le prototype utilise une instance locale sur `http://localhost:8080`.
+
+Configuration :
+
+- `infra/searxng/settings.example.yml` est versionné ;
+- `infra/searxng/settings.yml` reste local et est ignoré par Git ;
+- le format JSON est activé pour l'appel du fournisseur TrustCheck.
+
+Commandes Docker utiles :
+
+```powershell
+docker ps --filter name=searxng
+docker start searxng
+docker stop searxng
+```
+
+Test du pipeline avec recherche :
+
+```powershell
+python -m prototype.cli --searxng-url "http://localhost:8080" "Le taux est de 10%."
+```
