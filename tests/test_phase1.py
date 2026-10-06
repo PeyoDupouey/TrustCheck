@@ -1,8 +1,10 @@
 import unittest
+import json
 from unittest.mock import patch
 
 from prototype.analyzer import analyze_text
 from prototype.claims import extract_claims
+from prototype.llm import OllamaFactChecker
 from prototype.models import Source
 from prototype.sources import SearxngSourceProvider, StaticSourceProvider
 
@@ -40,6 +42,29 @@ class Phase1Tests(unittest.TestCase):
 
         self.assertEqual(results[0].title, "Institution")
         self.assertEqual(results[0].url, "https://example.org")
+
+    def test_ollama_judge_parses_structured_response(self):
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self):
+                payload = {
+                    "message": {
+                        "content": '{"verdict":"confirmée","confidence":0.9,"explanation":"Les sources concordent.","source_urls":["https://example.org"]}'
+                    }
+                }
+                return json.dumps(payload).encode("utf-8")
+
+        source = Source("Source", "https://example.org", "Preuve")
+        with patch("prototype.llm.urlopen", return_value=FakeResponse()):
+            result = OllamaFactChecker().judge(extract_claims("Le taux est de 10%.")[0], [source])
+
+        self.assertEqual(result["verdict"], "confirmée")
+        self.assertEqual(result["source_urls"], ["https://example.org"])
 
 
 if __name__ == "__main__":

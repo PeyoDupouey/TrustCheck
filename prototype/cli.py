@@ -5,6 +5,7 @@ import sys
 from dataclasses import asdict
 
 from .analyzer import analyze_text
+from .llm import OllamaFactChecker
 from .sources import SearxngSourceProvider, StaticSourceProvider
 
 
@@ -16,12 +17,23 @@ def main() -> int:
         default=os.getenv("TRUSTCHECK_SEARXNG_URL"),
         help="URL d'une instance SearXNG compatible JSON (optionnel)",
     )
+    parser.add_argument(
+        "--ollama-url",
+        default=os.getenv("TRUSTCHECK_OLLAMA_URL"),
+        help="URL d'Ollama (optionnel, ex. http://localhost:11434)",
+    )
+    parser.add_argument(
+        "--ollama-model",
+        default=os.getenv("TRUSTCHECK_OLLAMA_MODEL", "qwen2.5:3b"),
+        help="Modèle Ollama à utiliser",
+    )
     args = parser.parse_args()
     text = args.text or sys.stdin.read()
     if not text.strip():
         parser.error("un texte est requis")
     provider = SearxngSourceProvider(args.searxng_url) if args.searxng_url else StaticSourceProvider()
-    print(json.dumps(asdict(analyze_text(text, provider)), ensure_ascii=False, indent=2))
+    judge = OllamaFactChecker(args.ollama_url, args.ollama_model) if args.ollama_url else None
+    print(json.dumps(asdict(analyze_text(text, provider, judge)), ensure_ascii=False, indent=2))
     return 0
 
 
