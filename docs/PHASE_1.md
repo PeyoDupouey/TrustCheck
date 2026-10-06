@@ -1,0 +1,26 @@
+# Phase 1 — Prototype local de vérification
+
+## Objectif
+
+Valider le contrat de données du moteur de vérification avant de dépendre d’Instagram, d’un LLM ou d’un moteur de recherche externe.
+
+## Ce qui est implémenté
+
+- extraction heuristique de phrases candidates ;
+- modèle de données pour affirmations, sources et résultats ;
+- fournisseur de sources interchangeable ;
+- résultat prudent lorsqu’aucune preuve n’est disponible ;
+- sortie JSON utilisable par une future API ou extension ;
+- tests unitaires sans réseau.
+
+## Limites connues
+
+- l’extraction n’est pas encore faite par un LLM ;
+- aucune recherche web n’est déclenchée ;
+- le prototype ne conclut pas automatiquement qu’une affirmation est vraie ou fausse ;
+- les sources de test sont statiques ;
+- le français est la langue cible initiale.
+
+## Prochaine itération
+
+Ajouter un fournisseur de recherche local configurable, puis comparer ses résultats avec un petit jeu de cas annotés avant d’introduire un modèle local.

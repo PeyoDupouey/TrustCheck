@@ -11,3 +11,7 @@ Les sous-titres accessibles d’Instagram sont utilisés avant une transcription
 ## D-003 — Verdicts gradués
 
 Le système ne produit pas uniquement vrai/faux. Il restitue un état, une confiance, les sources et les limites de l’analyse.
+
+## D-004 — Prototype sans réseau par défaut
+
+La première implémentation utilise un fournisseur de sources interchangeable et déterministe. Aucun contenu utilisateur n'est envoyé sur Internet et aucun verdict de vérité n'est simulé en l'absence de preuves.
