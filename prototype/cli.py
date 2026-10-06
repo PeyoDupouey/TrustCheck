@@ -29,13 +29,19 @@ def main() -> int:
         default=os.getenv("TRUSTCHECK_OLLAMA_MODEL", "qwen2.5:0.5b"),
         help="Modèle Ollama à utiliser",
     )
+    parser.add_argument(
+        "--max-claims",
+        type=int,
+        default=3,
+        help="Nombre maximal d'affirmations du contenu visible à traiter",
+    )
     args = parser.parse_args()
     text = args.text or sys.stdin.read()
     if not text.strip():
         parser.error("un texte est requis")
     provider = SearxngSourceProvider(args.searxng_url) if args.searxng_url else StaticSourceProvider()
     judge = OllamaFactChecker(args.ollama_url, args.ollama_model) if args.ollama_url else None
-    print(json.dumps(asdict(analyze_text(text, provider, judge)), ensure_ascii=False, indent=2))
+    print(json.dumps(asdict(analyze_text(text, provider, judge, args.max_claims)), ensure_ascii=False, indent=2))
     return 0
 
 

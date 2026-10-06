@@ -3,8 +3,16 @@ from .models import Analysis, Claim, ClaimResult
 from .sources import SourceProvider
 
 
-def analyze_text(text: str, provider: SourceProvider, judge=None) -> Analysis:
-    results = [_analyze_claim(claim, provider, judge) for claim in extract_claims(text)]
+def analyze_text(text: str, provider: SourceProvider, judge=None, max_claims: int = 3) -> Analysis:
+    """Analyse seulement quelques affirmations du contenu visible.
+
+    La limite évite de bloquer le défilement sur une publication contenant
+    beaucoup de phrases. Une future extension pourra lancer les suivantes en
+    arrière-plan si l'utilisateur reste sur la publication.
+    """
+
+    claims = extract_claims(text)[:max_claims]
+    results = [_analyze_claim(claim, provider, judge) for claim in claims]
     return Analysis(results=results)
 
 

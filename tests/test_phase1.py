@@ -3,6 +3,7 @@ import json
 from unittest.mock import patch
 
 from prototype.analyzer import analyze_text
+from prototype.cache import MemoryTTLCache, content_key
 from prototype.claims import extract_claims
 from prototype.llm import OllamaFactChecker
 from prototype.models import Source
@@ -10,6 +11,14 @@ from prototype.sources import SearxngSourceProvider, StaticSourceProvider
 
 
 class Phase1Tests(unittest.TestCase):
+    def test_content_key_does_not_depend_on_whitespace_or_case(self):
+        self.assertEqual(content_key("  Une   affirmation. "), content_key("une affirmation."))
+
+    def test_ttl_cache_returns_values(self):
+        cache = MemoryTTLCache(ttl_seconds=60)
+        cache.put("claim", ["source"])
+        self.assertEqual(cache.get("claim"), ["source"])
+
     def test_extracts_factual_sentence_and_ignores_opinion(self):
         claims = extract_claims("Cette réforme est entrée en vigueur en 2024. Je la trouve utile.")
         self.assertEqual([claim.text for claim in claims], ["Cette réforme est entrée en vigueur en 2024."])
@@ -42,6 +51,39 @@ class Phase1Tests(unittest.TestCase):
 
         self.assertEqual(results[0].title, "Institution")
         self.assertEqual(results[0].url, "https://example.org")
+
+    def test_searxng_provider_limits_results_and_caches(self):
+        calls = 0
+
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self):
+                return json.dumps({
+                    "results": [
+                        {"title": str(index), "url": f"https://example.org/{index}", "content": "preuve"}
+                        for index in range(6)
+                    ]
+                }).encode("utf-8")
+
+        def fake_urlopen(*args, **kwargs):
+            nonlocal calls
+            calls += 1
+            return FakeResponse()
+
+        with patch("prototype.sources.urlopen", side_effect=fake_urlopen):
+            provider = SearxngSourceProvider("http://localhost:8080", max_results=2)
+            claim = extract_claims("Le taux est de 10%.")[0]
+            first = provider.search(claim)
+            second = provider.search(claim)
+
+        self.assertEqual(len(first), 2)
+        self.assertEqual(first, second)
+        self.assertEqual(calls, 1)
 
     def test_ollama_judge_parses_structured_response(self):
         class FakeResponse:

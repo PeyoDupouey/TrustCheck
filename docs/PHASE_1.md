@@ -13,6 +13,8 @@ Valider le contrat de données du moteur de vérification avant de dépendre d�
 - client Ollama local avec sortie JSON structurée ;
 - résultat prudent lorsqu’aucune preuve n’est disponible ;
 - sortie JSON utilisable par une future API ou extension ;
+- cache mémoire court des recherches SearXNG ;
+- limite de trois affirmations et cinq sources par contenu pour préserver la réactivité ;
 - tests unitaires sans réseau.
 
 ## Limites connues
@@ -23,6 +25,15 @@ Valider le contrat de données du moteur de vérification avant de dépendre d�
 - les sources de test sont statiques ;
 - SearXNG doit être fourni par l'utilisateur et n'est pas lancé automatiquement ;
 - le français est la langue cible initiale.
+- le CLI reste synchrone : l'interface progressive et l'annulation seront ajoutées avec l'extension.
+
+## Contrat de réactivité
+
+Le moteur ne doit pas analyser tout le flux. L'extension cible un seul contenu
+visible à la fois, affiche immédiatement un état `analyse en cours`, puis lance
+la recherche et le jugement en arrière-plan. Si l'utilisateur passe au contenu
+suivant, la tâche précédente doit être annulée. Les résultats sont conservés
+dans un cache court indexé par empreinte, sans conserver le texte original.
 
 ## Prochaine itération
 
