@@ -9,6 +9,7 @@ Valider le contrat de données du moteur de vérification avant de dépendre d�
 - extraction heuristique de phrases candidates ;
 - modèle de données pour affirmations, sources et résultats ;
 - fournisseur de sources interchangeable ;
+- fournisseur SearXNG optionnel, sans clé API ;
 - résultat prudent lorsqu’aucune preuve n’est disponible ;
 - sortie JSON utilisable par une future API ou extension ;
 - tests unitaires sans réseau.
@@ -19,8 +20,9 @@ Valider le contrat de données du moteur de vérification avant de dépendre d�
 - aucune recherche web n’est déclenchée ;
 - le prototype ne conclut pas automatiquement qu’une affirmation est vraie ou fausse ;
 - les sources de test sont statiques ;
+- SearXNG doit être fourni par l'utilisateur et n'est pas lancé automatiquement ;
 - le français est la langue cible initiale.
 
 ## Prochaine itération
 
-Ajouter un fournisseur de recherche local configurable, puis comparer ses résultats avec un petit jeu de cas annotés avant d’introduire un modèle local.
+Configurer une instance SearXNG locale, puis comparer ses résultats avec un petit jeu de cas annotés avant d'introduire un modèle local.

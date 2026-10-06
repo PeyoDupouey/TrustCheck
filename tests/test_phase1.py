@@ -1,9 +1,10 @@
 import unittest
+from unittest.mock import patch
 
 from prototype.analyzer import analyze_text
 from prototype.claims import extract_claims
 from prototype.models import Source
-from prototype.sources import StaticSourceProvider
+from prototype.sources import SearxngSourceProvider, StaticSourceProvider
 
 
 class Phase1Tests(unittest.TestCase):
@@ -22,7 +23,24 @@ class Phase1Tests(unittest.TestCase):
         self.assertEqual(analysis.results[0].sources, [source])
         self.assertEqual(analysis.results[0].verdict, "à examiner")
 
+    def test_searxng_provider_maps_json_results(self):
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self):
+                return b'{"results": [{"title": "Institution", "url": "https://example.org", "content": "Extrait"}]}'
+
+        with patch("prototype.sources.urlopen", return_value=FakeResponse()):
+            provider = SearxngSourceProvider("http://localhost:8080")
+            results = provider.search(extract_claims("Le taux est de 10%.")[0])
+
+        self.assertEqual(results[0].title, "Institution")
+        self.assertEqual(results[0].url, "https://example.org")
+
 
 if __name__ == "__main__":
     unittest.main()
-
