@@ -18,7 +18,16 @@ def _analyze_claim(claim: Claim, provider: SourceProvider, judge=None) -> ClaimR
             explanation="Aucune source n'a été fournie au prototype.",
         )
     if judge is not None:
-        judged = judge.judge(claim, sources)
+        try:
+            judged = judge.judge(claim, sources)
+        except (OSError, TimeoutError, ValueError) as error:
+            return ClaimResult(
+                claim=claim,
+                verdict="non vérifiable",
+                confidence=0.0,
+                explanation=f"La réponse du LLM n'est pas exploitable : {error}.",
+                sources=sources,
+            )
         selected_sources = [source for source in sources if source.url in judged["source_urls"]]
         return ClaimResult(
             claim=claim,

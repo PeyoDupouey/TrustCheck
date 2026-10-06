@@ -10,6 +10,8 @@ from .sources import SearxngSourceProvider, StaticSourceProvider
 
 
 def main() -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description="Analyse locale TrustCheck")
     parser.add_argument("text", nargs="?", help="Texte à analyser")
     parser.add_argument(
@@ -24,7 +26,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--ollama-model",
-        default=os.getenv("TRUSTCHECK_OLLAMA_MODEL", "qwen2.5:3b"),
+        default=os.getenv("TRUSTCHECK_OLLAMA_MODEL", "qwen2.5:0.5b"),
         help="Modèle Ollama à utiliser",
     )
     args = parser.parse_args()

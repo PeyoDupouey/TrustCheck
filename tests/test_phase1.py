@@ -66,6 +66,16 @@ class Phase1Tests(unittest.TestCase):
         self.assertEqual(result["verdict"], "confirmée")
         self.assertEqual(result["source_urls"], ["https://example.org"])
 
+    def test_invalid_llm_response_falls_back_to_unverifiable(self):
+        class BrokenJudge:
+            def judge(self, claim, sources):
+                raise ValueError("JSON invalide")
+
+        source = Source("Source", "https://example.org", "Preuve")
+        analysis = analyze_text("Le taux est de 10%.", StaticSourceProvider([source]), BrokenJudge())
+        self.assertEqual(analysis.results[0].verdict, "non vérifiable")
+        self.assertEqual(analysis.results[0].confidence, 0.0)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -30,7 +30,7 @@ Configurer une instance SearXNG locale, puis comparer ses résultats avec un pet
 
 ## Analyse Ollama
 
-Ollama est appelé uniquement lorsqu'une URL est fournie. Le modèle reçoit l'affirmation et les extraits des sources, puis doit retourner un verdict gradué, une confiance, une explication et les URLs utilisées. La réponse est contrainte par un schéma JSON et les URLs retournées sont filtrées contre les sources réellement fournies.
+Ollama est appelé uniquement lorsqu'une URL est fournie. Le modèle reçoit l'affirmation et au maximum cinq extraits de sources, puis doit retourner un verdict gradué, une confiance, une explication et les URLs utilisées. La réponse est contrainte par un schéma JSON et les URLs retournées sont filtrées contre les sources réellement fournies.
 
 Test local :
 

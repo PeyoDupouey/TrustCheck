@@ -19,15 +19,16 @@ VERDICT_VALUES = [
 class OllamaFactChecker:
     """Client minimal de l'API Ollama locale avec sortie JSON structurée."""
 
-    def __init__(self, base_url: str = "http://localhost:11434", model: str = "qwen2.5:3b", timeout: float = 120.0) -> None:
+    def __init__(self, base_url: str = "http://localhost:11434", model: str = "qwen2.5:3b", timeout: float = 300.0, max_sources: int = 5) -> None:
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.timeout = timeout
+        self.max_sources = max_sources
 
     def judge(self, claim: Claim, sources: Iterable[Source]) -> dict:
-        source_list = list(sources)
+        source_list = list(sources)[: self.max_sources]
         evidence = "\n\n".join(
-            f"[{index}] {source.title}\nURL: {source.url}\nExtrait: {source.excerpt}"
+            f"[{index}] {source.title}\nURL: {source.url}\nExtrait: {source.excerpt[:600]}"
             for index, source in enumerate(source_list, start=1)
         )
         schema = {
@@ -52,7 +53,7 @@ class OllamaFactChecker:
             "messages": [{"role": "user", "content": prompt}],
             "stream": False,
             "format": schema,
-            "options": {"temperature": 0},
+            "options": {"temperature": 0, "num_predict": 256},
         }
         request = Request(
             f"{self.base_url}/api/chat",
@@ -68,4 +69,3 @@ class OllamaFactChecker:
         result["confidence"] = max(0.0, min(1.0, float(result["confidence"])))
         result["source_urls"] = [url for url in result.get("source_urls", []) if isinstance(url, str)]
         return result
-
