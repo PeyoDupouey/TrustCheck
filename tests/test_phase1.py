@@ -6,6 +6,7 @@ from prototype.analyzer import analyze_text
 from prototype.cache import MemoryTTLCache, content_key
 from prototype.claims import extract_claims
 from prototype.llm import OllamaFactChecker
+from prototype.gemini import GeminiFactChecker
 from prototype.models import Source
 from prototype.sources import SearxngSourceProvider, StaticSourceProvider
 
@@ -132,6 +133,32 @@ class Phase1Tests(unittest.TestCase):
             result = OllamaFactChecker().judge(extract_claims("Le taux est de 10%.")[0], sources)
 
         self.assertEqual(result["source_urls"], ["https://one.example"])
+
+    def test_gemini_judge_maps_structured_response(self):
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self):
+                payload = {
+                    "candidates": [{"content": {"parts": [{"text": json.dumps({
+                        "verdict": "confirmée",
+                        "confidence": 0.9,
+                        "explanation": "La source confirme.",
+                        "source_indexes": [1],
+                    })}]}}]
+                }
+                return json.dumps(payload).encode("utf-8")
+
+        source = Source("Source", "https://example.org", "Preuve")
+        with patch("prototype.gemini.urlopen", return_value=FakeResponse()):
+            result = GeminiFactChecker("test-key").judge(extract_claims("Le taux est de 10%.")[0], [source])
+
+        self.assertEqual(result["verdict"], "confirmée")
+        self.assertEqual(result["source_urls"], ["https://example.org"])
 
     def test_invalid_llm_response_falls_back_to_unverifiable(self):
         class BrokenJudge:

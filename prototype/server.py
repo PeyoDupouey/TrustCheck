@@ -8,6 +8,7 @@ from dataclasses import asdict
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from .analyzer import analyze_text
+from .gemini import GeminiFactChecker
 from .llm import OllamaFactChecker
 from .sources import SearxngSourceProvider, StaticSourceProvider
 
@@ -58,8 +59,12 @@ class TrustCheckHandler(BaseHTTPRequestHandler):
 def main() -> None:
     searxng_url = os.getenv("TRUSTCHECK_SEARXNG_URL")
     ollama_url = os.getenv("TRUSTCHECK_OLLAMA_URL")
+    gemini_key = os.getenv("GEMINI_API_KEY")
     TrustCheckHandler.provider = SearxngSourceProvider(searxng_url) if searxng_url else StaticSourceProvider()
-    TrustCheckHandler.judge = (
+    TrustCheckHandler.judge = GeminiFactChecker(
+        gemini_key,
+        os.getenv("GEMINI_MODEL", "gemini-2.5-flash"),
+    ) if gemini_key else (
         OllamaFactChecker(ollama_url, os.getenv("TRUSTCHECK_OLLAMA_MODEL", "qwen2.5:0.5b"))
         if ollama_url
         else None

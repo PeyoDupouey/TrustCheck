@@ -14,6 +14,17 @@ $env:TRUSTCHECK_OLLAMA_URL = "http://localhost:11434"
 & "C:\Users\admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" -m prototype.server
 ```
 
+Pour utiliser Gemini directement, définir la clé uniquement dans le terminal
+qui lance l'API locale. Elle n'est jamais ajoutée à l'extension :
+
+```powershell
+$env:GEMINI_API_KEY = "ta-cle-gemini"
+$env:GEMINI_MODEL = "gemini-2.5-flash"
+& "C:\Users\admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe" -m prototype.server
+```
+
+Lorsque `GEMINI_API_KEY` est définie, Gemini devient prioritaire sur Ollama.
+
 ## Charger l'extension
 
 Dans Chrome ou Edge :
