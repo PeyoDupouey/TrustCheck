@@ -1,0 +1,12 @@
+# Configuration locale de GitHub CLI — peut contenir des informations d’authentification
+.gh-config/
+
+# Fichiers système et environnements locaux
+.env
+.env.*
+!.env.example
+__pycache__/
+.pytest_cache/
+node_modules/
+dist/
+build/
