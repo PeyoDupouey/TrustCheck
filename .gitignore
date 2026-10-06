@@ -1,5 +1,7 @@
 # Configuration locale de GitHub CLI — peut contenir des informations d’authentification
 .gh-config/
+.docker-config/
+infra/searxng/settings.yml
 
 # Fichiers système et environnements locaux
 .env
