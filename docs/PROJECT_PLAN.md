@@ -41,7 +41,7 @@ Créer une extension de navigateur qui analyse le contenu visible sur Instagram 
 2. Initialiser le dépôt et la documentation.
 3. Concevoir le contrat d’analyse et le format des preuves.
 4. Prototyper l’extraction d’affirmations hors navigateur. **En cours — voir `docs/PHASE_1.md`.**
-5. Ajouter l’extension minimale avec annulation, cache et analyse progressive.
+5. Ajouter l’extension minimale avec annulation, cache et analyse progressive. **En cours — voir `extension/`.**
 6. Ajouter les sous-titres, l’OCR et la transcription fallback.
 7. Construire le jeu d’évaluation et mesurer les erreurs.
 8. Préparer une bêta limitée.

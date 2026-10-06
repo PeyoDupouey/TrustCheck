@@ -15,3 +15,10 @@ Le système ne produit pas uniquement vrai/faux. Il restitue un état, une confi
 ## D-004 — Prototype sans réseau par défaut
 
 La première implémentation utilise un fournisseur de sources interchangeable et déterministe. Aucun contenu utilisateur n'est envoyé sur Internet et aucun verdict de vérité n'est simulé en l'absence de preuves.
+
+## D-005 — Extension progressive et locale
+
+L'extension ne bloque pas le défilement et ne lance pas une analyse sur tout le
+flux. Elle propose l'analyse du post visible, affiche son état immédiatement,
+annule les résultats obsolètes et appelle par défaut une API locale. Cette
+limite réduit la latence, la collecte de données et la charge de calcul.
